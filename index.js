@@ -1,10 +1,19 @@
-const express = require('express')
-const app = express()
+const express = require('express');
 const morgan = require('morgan');
+const app = express();
 
-app.use(express.json())
-app.use(morgan('tiny'));
+// Define a custom token for logging the request body
+morgan.token('request-body', (request, resesponse) => {
+  return JSON.stringify(request.body);
+});
 
+// Add middleware for parsing JSON request bodies
+app.use(express.json());
+
+// Add the morgan middleware with custom format
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :request-body'));
+
+// Data
 let persons = [
 	{ 
         "id": 1,
@@ -28,6 +37,7 @@ let persons = [
       }
 ]
 
+// Routes
 app.get('/', (request, response) => {
   response.send('<h1>Hello World!</h1>')
 })
@@ -92,6 +102,7 @@ app.post('/api/persons', (request, response) => {
   response.json(person)
 })
 
+// Start the server
 const PORT = 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
