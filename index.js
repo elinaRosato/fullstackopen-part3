@@ -14,8 +14,11 @@ app.use(express.json());
 // Add the morgan middleware with custom format
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :request-body'));
 
-// Add the cors middleware
+// Add the static middleware
 app.use(cors())
+
+// Add the cors middleware to show static content
+app.use(express.static('build'))
 
 // Data
 let persons = [
