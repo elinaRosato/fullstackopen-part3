@@ -1,7 +1,10 @@
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors')
+const mongoose = require('mongoose')
+
 const app = express();
+const url = `mongodb+srv://admin:${password}@phonebook-cluster.k6b45ya.mongodb.net/phonebookApp?retryWrites=true&w=majority`
 
 // Define a custom token for logging the request body
 morgan.token('request-body', (request, resesponse) => {
@@ -19,6 +22,17 @@ app.use(cors())
 
 // Add the cors middleware to show static content
 app.use(express.static('build'))
+
+//
+mongoose.set('strictQuery',false)
+mongoose.connect(url)
+
+const personSchema = new mongoose.Schema({
+  name: String,
+  number: String,
+})
+
+const Person = mongoose.model('Person', personSchema)
 
 // Data
 let persons = [
@@ -55,7 +69,11 @@ app.get('/info', (request, response) => {
 })
 
 app.get('/api/persons', (request, response) => {
-  response.json(persons)
+  Person.find({}).then(result => {
+    result.forEach(person => {
+      console.log(person)
+    })
+  })
 })
 
 app.get('/api/persons/:id', (request, response) => {
