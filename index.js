@@ -52,7 +52,9 @@ app.get('/', (request, response) => {
 
 app.get('/info', (request, response) => {
   const timestamp = new Date();
-  response.send(`<div><p>Phonebook has info for ${persons.length} people</p><p>${timestamp}</p></div>`)
+  Person.find({}).then(persons => {
+    response.send(`<div><p>Phonebook has info for ${persons.length} people</p><p>${timestamp}</p></div>`)
+    })
 })
 
 app.get('/api/persons', (request, response) => {
@@ -62,32 +64,21 @@ app.get('/api/persons', (request, response) => {
   })
 
 app.get('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  const person = persons.find(person => person.id === id)
-  if (person) {
+  Person.findById(request.params.id).then(person => {
     response.json(person)
-  } else {
-    response.status(404).end()
-  }
+    })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  persons = persons.filter(person => person.id !== id)
-
-  response.status(204).end()
+  const id = request.params.id
+  Person.findByIdAndDelete(id)
+    .then(() => {
+      response.status(204).end(); // HTTP 204 No Content
+    })
 })
-
-const generateId = () => {
-  const newId = persons.length > 0
-    ? Math.random()*10000
-    : 0
-  return newId
-}
 
 app.post('/api/persons', (request, response) => {
 	const body = request.body
-  console.log(body)
 	if (!body.name) {
     return response.status(400).json({ 
       error: 'name missing' 
@@ -98,18 +89,20 @@ app.post('/api/persons', (request, response) => {
       error: 'number missing' 
     })
   }
-  if (persons.find(person => person.name === body.name)) {
-    return response.status(400).json({ 
-      error: 'name must be unique' 
+  Person.find({}).then(persons => {
+    if (persons.find(person => person.name === body.name)) {
+      return response.status(400).json({ 
+        error: 'name must be unique' 
+      })
+    }
+    const person = new Person ({
+      name: body.name,
+      number: body.number
     })
-  }
-  const person = {
-    id: generateId(),
-    name: body.name,
-    number: body.number
-  }
-  persons = persons.concat(person)
-  response.json(person)
+    person.save().then(savedPerson => {
+      response.json(savedPerson)
+    })
+  })
 })
 
 // Start the server
