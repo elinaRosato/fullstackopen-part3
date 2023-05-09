@@ -1,10 +1,8 @@
 const express = require('express');
 const morgan = require('morgan');
-const cors = require('cors')
-const mongoose = require('mongoose')
-
+const cors = require('cors');
+const Person = require('./models/persons');
 const app = express();
-const url = `mongodb+srv://admin:${password}@phonebook-cluster.k6b45ya.mongodb.net/phonebookApp?retryWrites=true&w=majority`
 
 // Define a custom token for logging the request body
 morgan.token('request-body', (request, resesponse) => {
@@ -22,17 +20,6 @@ app.use(cors())
 
 // Add the cors middleware to show static content
 app.use(express.static('build'))
-
-//
-mongoose.set('strictQuery',false)
-mongoose.connect(url)
-
-const personSchema = new mongoose.Schema({
-  name: String,
-  number: String,
-})
-
-const Person = mongoose.model('Person', personSchema)
 
 // Data
 let persons = [
@@ -69,12 +56,10 @@ app.get('/info', (request, response) => {
 })
 
 app.get('/api/persons', (request, response) => {
-  Person.find({}).then(result => {
-    result.forEach(person => {
-      console.log(person)
+  Person.find({}).then(persons => {
+    response.json(persons)
     })
   })
-})
 
 app.get('/api/persons/:id', (request, response) => {
   const id = Number(request.params.id)
@@ -128,7 +113,7 @@ app.post('/api/persons', (request, response) => {
 })
 
 // Start the server
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
