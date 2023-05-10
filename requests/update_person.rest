@@ -1,0 +1,7 @@
+PUT https://persons-service.onrender.com/api/persons/645a10caa361a30fd85f2d39
+Content-Type: application/json
+
+{
+    "name": "Elina Rosato",
+    "number": "46-73-4776383"
+}
