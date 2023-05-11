@@ -68,13 +68,12 @@ app.get('/api/persons/:id', (request, response, next) => {
     .catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (request, respons, next) => {
+app.delete('/api/persons/:id', (request, response) => {
   const id = request.params.id
   Person.findByIdAndDelete(id)
     .then(result => {
       response.status(204).end(); // HTTP 204 No Content
     })
-    .catch(error => next(error))
 })
 
 app.post('/api/persons', (request, response, next) => {
