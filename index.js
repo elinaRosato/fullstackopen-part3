@@ -28,6 +28,10 @@ const unknownEndpoint = (request, response) => {
 }
 
 // Routes
+app.get('/', (request, response) => {
+  response.send()
+})
+
 app.get('/info', (request, response, next) => {
   const timestamp = new Date();
   Person.find({})
