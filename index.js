@@ -78,12 +78,19 @@ app.delete('/api/persons/:id', (request, respons, next) => {
 })
 
 app.post('/api/persons', (request, response, next) => {
-	const body = request.body
+	const { name, number } = request.body
+
+  Person.find({ name: name })
+    .then(persons => {
+      if ( persons.length > 0 ) {
+        return response.status(400).json({ error: 'name must be unique' })
+      }
 
       const person = new Person ({
-        name: body.name,
-        number: body.number
+        name: name,
+        number: number
       })
+      
       person.save()
         .then(savedPerson => {
           response.json(savedPerson)
@@ -91,6 +98,7 @@ app.post('/api/persons', (request, response, next) => {
         .catch(error => next(error))
     })
     .catch(error => next(error))
+})
 
 app.put('/api/persons/:id', (request, response, next) => {
   const { name, number } = request.body
