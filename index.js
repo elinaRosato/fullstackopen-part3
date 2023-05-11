@@ -27,18 +27,6 @@ const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
 }
 
-// Add the static middleware
-app.use(cors())
-
-// Add middleware for parsing JSON request bodies
-app.use(express.json());
-
-// Add the morgan middleware with custom format
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :request-body'));
-
-// Add the cors middleware to show static content
-app.use(express.static('build'))
-
 // Routes
 app.get('/info', (request, response, next) => {
   const timestamp = new Date();
@@ -90,7 +78,7 @@ app.post('/api/persons', (request, response, next) => {
         name: name,
         number: number
       })
-      
+
       person.save()
         .then(savedPerson => {
           response.json(savedPerson)
